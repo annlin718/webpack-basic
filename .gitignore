@@ -1,0 +1,5 @@
+# 檔案名稱 .gitignore
+
+# 忽略以下兩個目錄
+/node_modules
+/dist

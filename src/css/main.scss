@@ -1,0 +1,13 @@
+$main-bg-pic:url('../image/dragon.png');
+$main-bg-color:rgb(255, 249, 170);
+
+body {
+    background: $main-bg-color;
+
+    .box1 {
+        display: flex;
+        width: 200px;
+        height: 200px;
+        background: pink;
+    }
+}
