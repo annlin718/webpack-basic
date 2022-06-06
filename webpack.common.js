@@ -64,10 +64,14 @@ module.exports = ({
             test: /\.m?js$/,
             exclude: /(node_modules|bower_components)/,
             use: {
-              loader: 'babel-loader'
-              //   options: {
-              //     presets: ['@babel/preset-env']
-              //   }
+              loader: 'babel-loader',
+              options: {
+                // presets: ['@babel/preset-env']
+                // 開啟babel緩存，加快打包速度
+                cacheDirectory: true,
+                // 關閉緩存文件壓縮
+                cacheCompression: false
+              }
             }
           }
         ]
@@ -81,7 +85,9 @@ module.exports = ({
     new CssMinimizerPlugin(),
     new ESLintPlugin({
       context: path.resolve(__dirname, 'src'),
-      fix: true
+      fix: true,
+      cache: true,
+      cacheLocation: path.resolve(__dirname, './node_modules/.cache/eslintcache')
     }),
     /* 只是要在 HTML 添加打包好的 webpack 檔案 */
     // new HtmlWebpackPlugin(),
