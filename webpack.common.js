@@ -1,8 +1,12 @@
+const os = require('os')
 const path = require('path')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ESLintPlugin = require('eslint-webpack-plugin')
+const TerserWebpackPlugin = require('terser-webpack-plugin')
+
+const threads = os.cpus().length// CPU核數
 
 function getStyleLoader (pre) {
   return [
@@ -63,16 +67,24 @@ module.exports = ({
           {
             test: /\.m?js$/,
             exclude: /(node_modules|bower_components)/,
-            use: {
-              loader: 'babel-loader',
-              options: {
+            use: [
+              {
+                loader: 'thread-loader',
+                options: {
+                  works: threads
+                }
+              },
+              {
+                loader: 'babel-loader',
+                options: {
                 // presets: ['@babel/preset-env']
                 // 開啟babel緩存，加快打包速度
-                cacheDirectory: true,
-                // 關閉緩存文件壓縮
-                cacheCompression: false
+                  cacheDirectory: true,
+                  // 關閉緩存文件壓縮
+                  cacheCompression: false
+                }
               }
-            }
+            ]
           }
         ]
       }
@@ -82,12 +94,12 @@ module.exports = ({
     extensions: ['.json', '.js', '.jsx']
   },
   plugins: [
-    new CssMinimizerPlugin(),
     new ESLintPlugin({
       context: path.resolve(__dirname, 'src'),
-      fix: true,
+      // fix: true,
       cache: true,
-      cacheLocation: path.resolve(__dirname, './node_modules/.cache/eslintcache')
+      cacheLocation: path.resolve(__dirname, './node_modules/.cache/eslintcache'),
+      threads
     }),
     /* 只是要在 HTML 添加打包好的 webpack 檔案 */
     // new HtmlWebpackPlugin(),
@@ -96,5 +108,15 @@ module.exports = ({
       title: 'webpack 測試頁面',
       template: './index.html' // 以 index.html 這支檔案當作模版注入 html
     })
-  ]
+  ],
+  optimization: {
+    minimizer: [
+      // 壓縮JS
+      new TerserWebpackPlugin({
+        parallel: threads
+      }),
+      // 壓縮CSS
+      new CssMinimizerPlugin()
+    ]
+  }
 })
