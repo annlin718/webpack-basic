@@ -110,10 +110,13 @@ module.exports = ({
     })
   ],
   optimization: {
+    usedExports: true,
+    minimize: true,
     minimizer: [
       // 壓縮JS
       new TerserWebpackPlugin({
         parallel: threads
+        // exclude: /\.(js)$/i
       }),
       // 壓縮CSS
       new CssMinimizerPlugin()
