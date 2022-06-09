@@ -26,10 +26,10 @@ function getStyleLoader (pre) {
 }
 
 module.exports = ({
-  entry: './src/main.js',
+  entry: { main: './src/main.js', app: './src/app.js' },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'js/main.bundle.js',
+    filename: 'js/[name].bundle.js',
     assetModuleFilename: 'static/images/[hash:10][ext][query]',
     clean: true
   },
@@ -81,7 +81,20 @@ module.exports = ({
                 // 開啟babel緩存，加快打包速度
                   cacheDirectory: true,
                   // 關閉緩存文件壓縮
-                  cacheCompression: false
+                  cacheCompression: false,
+                  plugins: [
+                    [
+                      // 減少代碼體積
+                      '@babel/plugin-transform-runtime',
+                      {
+                        absoluteRuntime: false,
+                        corejs: false,
+                        helpers: true,
+                        regenerator: true,
+                        version: '7.0.0-beta.0'
+                      }
+                    ]
+                  ]
                 }
               }
             ]
@@ -120,6 +133,27 @@ module.exports = ({
       }),
       // 壓縮CSS
       new CssMinimizerPlugin()
-    ]
+    ],
+    splitChunks: {
+      chunks: 'all',
+      minSize: 20000,
+      minRemainingSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 30,
+      maxInitialRequests: 30,
+      enforceSizeThreshold: 50000, // 超過50KB一定會單獨打包
+      cacheGroups: {
+        defaultVendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          reuseExistingChunk: true
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
   }
 })
