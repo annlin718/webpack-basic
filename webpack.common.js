@@ -5,6 +5,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ESLintPlugin = require('eslint-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
+const WorkboxPlugin = require('workbox-webpack-plugin')
 
 const threads = os.cpus().length// CPU核數
 
@@ -29,7 +30,8 @@ module.exports = ({
   entry: { main: './src/main.js', app: './src/app.js' },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'js/[name].bundle.js',
+    filename: 'static/js/[name].[contenthash:8].bundle.js',
+    chunkFilename: 'static/js/[name].chunks.[contenthash:8].js',
     assetModuleFilename: 'static/images/[hash:10][ext][query]',
     clean: true
   },
@@ -120,6 +122,12 @@ module.exports = ({
     new HtmlWebpackPlugin({
       title: 'webpack 測試頁面',
       template: './index.html' // 以 index.html 這支檔案當作模版注入 html
+    }),
+    new WorkboxPlugin.GenerateSW({
+      // 这些选项帮助快速启用 ServiceWorkers
+      // 不允许遗留任何“旧的” ServiceWorkers
+      clientsClaim: true,
+      skipWaiting: true
     })
   ],
   optimization: {
@@ -154,6 +162,10 @@ module.exports = ({
           reuseExistingChunk: true
         }
       }
+    },
+    runtimeChunk: {
+      // name: (entrypoint) => `runtime~${entrypoint.name}`
+      name: 'runtime'
     }
   }
 })

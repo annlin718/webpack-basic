@@ -14,8 +14,8 @@ module.exports = merge(common, {
       // Options similar to the same options in webpackOptions.output
       // both options are optional
       linkType: false,
-      filename: './css/[name].[hash:10].css',
-      chunkFilename: '[id].[hash:10].css'
+      filename: 'static/css/[name].[hash:10].css',
+      chunkFilename: 'static/css/[name].[hash:10].chunk.css'
     })
   ]
 })
